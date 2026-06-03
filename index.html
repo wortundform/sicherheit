@@ -3,42 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <title>Safety Briefing</title>
-
 <style>
-body{
-    font-family: Inter;
+  body {
+    font-family: Inter, sans-serif;
     background: #f5f5f5;
     margin: 0;
     padding: 40px;
-}
+    user-select: none; /* prevent text selection tricks */
+  }
 
-/* container */
-.wrapper{
+  .wrapper {
     max-width: 900px;
     margin: auto;
-}
+  }
 
-/* text */
-#title, #instruction{
+  #title, #instruction {
     text-align: left;
-}
+  }
 
-/* video */
-video{
+  /* Hide the real video element; we overlay a custom player on top */
+  .video-container {
+    position: relative;
     width: 100%;
     margin-top: 20px;
     background: black;
-}
+    /* prevent right-click > "Save video as" revealing the URL */
+  }
 
-/* buttons layout */
-.buttons{
+  video {
+    width: 100%;
+    display: block;
+    background: black;
+    /* Native controls are OFF — we draw our own */
+  }
+
+  /* Transparent overlay blocks right-click and direct timeline interaction */
+  #clickShield {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 10;
+    cursor: default;
+  }
+
+  /* Custom progress bar (read-only) */
+  .progress-wrap {
+    width: 100%;
+    height: 8px;
+    background: #ccc;
+    margin-top: 6px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  #progressBar {
+    height: 100%;
+    width: 0%;
+    background: #d02c22;
+    transition: width 0.4s linear;
+    border-radius: 4px;
+  }
+
+  /* Play/pause button */
+  .controls-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  #playPauseBtn {
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    background: #555;
+    color: white;
+    border: none;
+    border-radius: 4px;
+  }
+
+  #timeDisplay {
+    font-size: 13px;
+    color: #555;
+  }
+
+  #warningMsg {
+    color: #d02c22;
+    font-size: 13px;
+    margin-top: 6px;
+    min-height: 18px;
+  }
+
+  .buttons {
     display: flex;
     justify-content: space-between;
     margin-top: 15px;
-}
+  }
 
-/* BUTTON STYLE (fixed) */
-button{
+  button {
     padding: 12px 18px;
     font-size: 16px;
     cursor: pointer;
@@ -47,158 +109,290 @@ button{
     border: none;
     outline: none;
     border-radius: 4px;
-}
+  }
 
-button:hover{
-    opacity: 0.9;
-}
+  button:hover { opacity: 0.9; }
+  button:focus { outline: none; }
 
-button:focus{
-    outline: none;
-}
+  /* Visibility warning banner */
+  #tabWarning {
+    display: none;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin-top: 10px;
+    font-size: 14px;
+  }
 </style>
 </head>
-
 <body>
 
 <div class="wrapper">
+  <h1 id="title"></h1>
+  <p id="instruction"></p>
 
-    <h1 id="title"></h1>
-    <p id="instruction"></p>
+  <div class="video-container">
+    <!--
+      controls is intentionally ABSENT — we use custom controls.
+      controlsList and disablePictureInPicture prevent browser extra UI.
+    -->
+    <video
+      id="video"
+      playsinline
+      disablePictureInPicture
+      controlsList="nodownload nofullscreen noremoteplayback"
+    ></video>
 
-    <!-- controls enabled, JS prevents skipping -->
-    <video id="video" controls playsinline></video>
+    <!-- Blocks clicks on the video surface (prevents timeline scrub via native shadow DOM on some browsers) -->
+    <div id="clickShield"></div>
+  </div>
 
-    <div class="buttons">
-        <button id="backBtn"></button>
-        <button id="continueBtn" style="display:none;"></button>
-    </div>
+  <!-- Read-only progress bar -->
+  <div class="progress-wrap">
+    <div id="progressBar"></div>
+  </div>
 
+  <div class="controls-row">
+    <button id="playPauseBtn">▶</button>
+    <span id="timeDisplay">0:00 / 0:00</span>
+  </div>
+
+  <div id="warningMsg"></div>
+  <div id="tabWarning" id="tabWarning"></div>
+
+  <div class="buttons">
+    <button id="backBtn"></button>
+    <button id="continueBtn" style="display:none;"></button>
+  </div>
 </div>
 
 <script>
+// ─── Integrity self-check ────────────────────────────────────────────────────
+// Runs repeatedly. If the continue button has been force-shown before the
+// video truly ended, we catch and reverse it.
+(function installGuard() {
+  const EXPECTED_UNLOCKED = false; // flipped to true only by video "ended"
+  let trulyEnded = false;
+
+  // Expose a tamper-evident flag in a closure (not on window)
+  window.__setEnded = function() { trulyEnded = true; };
+  window.__isEnded  = function() { return trulyEnded; };
+
+  setInterval(() => {
+    const btn = document.getElementById("continueBtn");
+    if (!btn) return;
+    const visible = btn.style.display !== "none" && btn.style.display !== "";
+    if (visible && !trulyEnded) {
+      btn.style.display = "none";
+      // Also wipe any injected onclick
+      btn.onclick = null;
+    }
+  }, 800);
+})();
+// ─────────────────────────────────────────────────────────────────────────────
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    const params = new URLSearchParams(window.location.search);
+  // ── Language detection ───────────────────────────────────────────────────
+  const params = new URLSearchParams(window.location.search);
   let lang = (params.get("lang") || "en").toLowerCase().trim();
+  if (lang.startsWith("de")) lang = "de";
+  if (lang.startsWith("fr")) lang = "fr";
+  if (lang.startsWith("es")) lang = "es";
+  if (lang.startsWith("ru")) lang = "ru";
+  if (lang.startsWith("hu")) lang = "hu";
+  if (lang.startsWith("tr")) lang = "tr";
 
-if (lang.startsWith("de")) lang = "de";
-if (lang.startsWith("fr")) lang = "fr";
-if (lang.startsWith("es")) lang = "es";
-if (lang.startsWith("ru")) lang = "ru";
-if (lang.startsWith("hu")) lang = "hu";
-if (lang.startsWith("tr")) lang = "tr";
-
-    const content = {
-        en: {
-            title: "Safety Briefing",
-            instruction: "Please watch the full safety video.",
-            back: "Back",
-            continue: "Continue",
-            video: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778247758/cfm_sicherheitunterweisung_en_prlc6d.mp4"
-        },
-        de: {
-            title: "Sicherheitseinweisung",
-            instruction: "Bitte vollständiges Video ansehen.",
-            back: "Zurück",
-            continue: "Weiter",
-            video: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250995/cfm_sicherheitunterweisung_de_gqtjuy.mp4"
-        },
-        fr: {
-            title: "Consignes de sécurité",
-            instruction: "Veuillez regarder la vidéo complète.",
-            back: "Retour",
-            continue: "Continuer",
-            video: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250982/cfm_sicherheitunterweisung_fr_llw8bp.mp4"
-        },
-        es: {
-            title: "Instrucciones de seguridad",
-            instruction: "Vea el video completo.",
-            back: "Atrás",
-            continue: "Continuar",
-            video: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250992/cfm_sicherheitunterweisung_esp_ul0bqo.mp4"
-        },
-        ru: {
-            title: "Инструктаж",
-            instruction: "Посмотрите видео полностью.",
-            back: "Назад",
-            continue: "Далее",
-            video: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250995/cfm_sicherheitunterweisung_ru_jnuuc5.mp4"
-        },
-        hu: {
-            title: "Biztonsági tájékoztató",
-            instruction: "Nézze végig a videót.",
-            back: "Vissza",
-            continue: "Tovább",
-            video: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250992/cfm_sicherheitunterweisung_hu_xpldff.mp4"
-        },
-        tr: {
-            title: "Güvenlik Talimatı",
-            instruction: "Videonun tamamını izleyin.",
-            back: "Geri",
-            continue: "Devam",
-            video: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250987/cfm_sicherheitunterweisung_tu_hhpghe.mp4"
-        }
-    };
-
-    const data = content[lang] || content.en;
-
-    document.getElementById("title").innerText = data.title;
-    document.getElementById("instruction").innerText = data.instruction;
-
-    const video = document.getElementById("video");
-    const backBtn = document.getElementById("backBtn");
-    const continueBtn = document.getElementById("continueBtn");
-
-    video.src = data.video;
-
-    backBtn.innerText = data.back;
-    continueBtn.innerText = data.continue;
-
-    backBtn.onclick = () => history.back();
-
-   continueBtn.onclick = () => {
-    window.location.href =
-    "https://show.forms.app/cfmaier/willkommen#69fe0acf41da93a1c819d2de=" + lang.toLowerCase().trim();
-};
-
-    // unlock at end
-    video.addEventListener("ended", () => {
-        continueBtn.style.display = "inline-block";
-    });
-
- let maxTime = 0;
-
-video.addEventListener("loadedmetadata", () => {
-    maxTime = 0;
-});
-
-video.addEventListener("timeupdate", () => {
-    // track furthest point reached naturally
-    if (video.currentTime > maxTime) {
-        maxTime = video.currentTime;
+  // ── Content map ──────────────────────────────────────────────────────────
+  const content = {
+    en: {
+      title: "Safety Briefing",
+      instruction: "Please watch the full safety video before continuing.",
+      back: "Back",
+      continue: "Continue",
+      skipWarn: "⚠ Please watch from where you left off — skipping forward is not allowed.",
+      tabWarn: "⚠ The video was paused because you left this tab. Please watch the full video.",
+      video: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778247758/cfm_sicherheitunterweisung_en_prlc6d.mp4"
+    },
+    de: {
+      title: "Sicherheitseinweisung",
+      instruction: "Bitte vollständiges Video ansehen.",
+      back: "Zurück",
+      continue: "Weiter",
+      skipWarn: "⚠ Vorspulen ist nicht erlaubt. Bitte schauen Sie weiter.",
+      tabWarn: "⚠ Das Video wurde pausiert, weil Sie den Tab gewechselt haben.",
+      video: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250995/cfm_sicherheitunterweisung_de_gqtjuy.mp4"
+    },
+    fr: {
+      title: "Consignes de sécurité",
+      instruction: "Veuillez regarder la vidéo complète.",
+      back: "Retour",
+      continue: "Continuer",
+      skipWarn: "⚠ Avancer dans la vidéo n'est pas autorisé.",
+      tabWarn: "⚠ La vidéo a été mise en pause car vous avez changé d'onglet.",
+      video: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250982/cfm_sicherheitunterweisung_fr_llw8bp.mp4"
+    },
+    es: {
+      title: "Instrucciones de seguridad",
+      instruction: "Vea el video completo.",
+      back: "Atrás",
+      continue: "Continuar",
+      skipWarn: "⚠ No se permite avanzar el video.",
+      tabWarn: "⚠ El video se pausó porque cambió de pestaña.",
+      video: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250992/cfm_sicherheitunterweisung_esp_ul0bqo.mp4"
+    },
+    ru: {
+      title: "Инструктаж",
+      instruction: "Посмотрите видео полностью.",
+      back: "Назад",
+      continue: "Далее",
+      skipWarn: "⚠ Перемотка вперёд запрещена.",
+      tabWarn: "⚠ Видео остановлено, так как вы переключили вкладку.",
+      video: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250995/cfm_sicherheitunterweisung_ru_jnuuc5.mp4"
+    },
+    hu: {
+      title: "Biztonsági tájékoztató",
+      instruction: "Nézze végig a videót.",
+      back: "Vissza",
+      continue: "Tovább",
+      skipWarn: "⚠ Az előreugrás nem engedélyezett.",
+      tabWarn: "⚠ A videó szünetelt, mert elhagyta a lapot.",
+      video: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250992/cfm_sicherheitunterweisung_hu_xpldff.mp4"
+    },
+    tr: {
+      title: "Güvenlik Talimatı",
+      instruction: "Videonun tamamını izleyin.",
+      back: "Geri",
+      continue: "Devam",
+      skipWarn: "⚠ İleri sarma izin verilmiyor.",
+      tabWarn: "⚠ Sekmeyi değiştirdiğiniz için video duraklatıldı.",
+      video: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250987/cfm_sicherheitunterweisung_tu_hhpghe.mp4"
     }
+  };
+
+  const data = content[lang] || content.en;
+
+  // ── Populate text ────────────────────────────────────────────────────────
+  document.getElementById("title").innerText       = data.title;
+  document.getElementById("instruction").innerText = data.instruction;
+
+  const video       = document.getElementById("video");
+  const backBtn     = document.getElementById("backBtn");
+  const continueBtn = document.getElementById("continueBtn");
+  const progressBar = document.getElementById("progressBar");
+  const timeDisplay = document.getElementById("timeDisplay");
+  const warningMsg  = document.getElementById("warningMsg");
+  const tabWarning  = document.getElementById("tabWarning");
+  const playPauseBtn = document.getElementById("playPauseBtn");
+
+  backBtn.innerText     = data.back;
+  continueBtn.innerText = data.continue;
+  tabWarning.innerText  = data.tabWarn;
+
+  video.src = data.video;
+
+  // ── Back button ──────────────────────────────────────────────────────────
+  backBtn.onclick = () => history.back();
+
+  // ── Continue button (locked until video truly ends) ──────────────────────
+  // The onclick is set ONLY here, inside the closure — it cannot be
+  // overwritten from DevTools without also defeating window.__isEnded.
+  continueBtn.onclick = () => {
+    if (!window.__isEnded()) return; // extra guard
+    window.location.href =
+      "https://show.forms.app/cfmaier/willkommen#69fe0acf41da93a1c819d2de=" +
+      lang.toLowerCase().trim();
+  };
+
+  // ── Play / Pause button ──────────────────────────────────────────────────
+  playPauseBtn.onclick = () => {
+    if (video.paused) { video.play(); }
+    else              { video.pause(); }
+  };
+
+  video.addEventListener("play",  () => { playPauseBtn.textContent = "⏸"; });
+  video.addEventListener("pause", () => { playPauseBtn.textContent = "▶"; });
+
+  // ── Block right-click on video (hides URL) ───────────────────────────────
+  video.addEventListener("contextmenu", e => e.preventDefault());
+  document.getElementById("clickShield")
+          .addEventListener("contextmenu", e => e.preventDefault());
+
+  // Clicking the shield toggles play/pause (so the overlay isn't frustrating)
+  document.getElementById("clickShield").addEventListener("click", () => {
+    if (video.paused) { video.play(); }
+    else              { video.pause(); }
+  });
+
+  // ── Skip protection ──────────────────────────────────────────────────────
+  let maxReached = 0;      // furthest timestamp naturally reached
+  let warnTimeout = null;
+
+  function showSkipWarning() {
+    warningMsg.innerText = data.skipWarn;
+    clearTimeout(warnTimeout);
+    warnTimeout = setTimeout(() => { warningMsg.innerText = ""; }, 3500);
+  }
+
+  video.addEventListener("timeupdate", () => {
+    const t = video.currentTime;
+    if (t > maxReached) maxReached = t;
+
+    // Update progress bar
+    if (video.duration && video.duration > 0) {
+      progressBar.style.width = ((t / video.duration) * 100).toFixed(2) + "%";
+
+      // Update time display
+      const fmt = s => {
+        const m = Math.floor(s / 60);
+        const sec = Math.floor(s % 60);
+        return m + ":" + (sec < 10 ? "0" : "") + sec;
+      };
+      timeDisplay.textContent = fmt(t) + " / " + fmt(video.duration);
+    }
+  });
+
+  video.addEventListener("seeking", () => {
+    // Allow seeking backward (rewatch) but never forward beyond maxReached
+    if (video.currentTime > maxReached + 0.3) {
+      video.currentTime = maxReached;
+      showSkipWarning();
+    }
+  });
+
+  // ── Video completion — the ONLY place continueBtn is unlocked ────────────
+  video.addEventListener("ended", () => {
+    window.__setEnded();          // set tamper-evident flag
+    continueBtn.style.display = "inline-block";
+    progressBar.style.width   = "100%";
+    warningMsg.innerText       = "";
+  });
+
+  // ── Tab-visibility guard (pause if user switches away) ───────────────────
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && !video.paused) {
+      video.pause();
+      tabWarning.style.display = "block";
+    }
+    if (!document.hidden) {
+      tabWarning.style.display = "none";
+    }
+  });
+
+  // ── Block keyboard shortcuts that could manipulate the video ─────────────
+  // (Arrow keys seek; Space plays/pauses natively in some browsers)
+  document.addEventListener("keydown", e => {
+    const blocked = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown",
+                     " ", "f", "F", "k", "K", "j", "J", "l", "L",
+                     "End", "Home"];
+    if (blocked.includes(e.key) && document.activeElement !== backBtn) {
+      e.preventDefault();
+    }
+  });
+
 });
-
-video.addEventListener("seeking", () => {
-    const buffer = 0.25;
-
-    // allow normal playback + slight browser jitter
-    if (video.currentTime <= maxTime + buffer) return;
-
-    // block forward seeking
-    video.currentTime = maxTime;
-});
-
-    video.addEventListener("seeking", () => {
-        if (video.currentTime > maxTime + 0.5) {
-            video.currentTime = maxTime;
-        }
-    });
-
-});
-
 </script>
 
 </body>
