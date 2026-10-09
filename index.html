@@ -337,11 +337,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // The onclick is set ONLY here, inside the closure — it cannot be
   // overwritten from DevTools without also defeating window.__isEnded.
   continueBtn.onclick = () => {
-    if (!window.__isEnded()) return; // extra guard
+    if (!window.__isEnded()) return;
     window.location.href =
-      "https://show.forms.app/cfmaier/willkommen#69fe0acf41da93a1c819d2de=" +
-      lang.toLowerCase().trim();
-  };
+      "https://show.forms.app/cfmaier/willkommen?lang=" +
+      encodeURIComponent(lang.toLowerCase().trim());
+};
 
   // ── Play / Pause button ──────────────────────────────────────────────────
   playPauseBtn.onclick = () => {
