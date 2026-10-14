@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C.F. Maier – Güvenlik Sunumu</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    #title {
+      color: #333;
+    }
+
+    .instruction {
+      color: #666;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="title">Güvenlik Sunumu</h1>
+    <p class="instruction" id="instruction">Lütfen tam güvenlik videosunu izleyin.</p>
+
+    <div id="videoContainer">
+      <video
+        id="video"
+        controlsList="nodownload noremoteplayback"
+        disablePictureInPicture
+        preload="metadata"
+      ></video>
+
+      <div id="clickShield"></div>
+
+      <div class="controls">
+        <div id="progressBar"></div>
+        <div class="controls-row">
+          <button id="playBtn" title="Play">▶</button>
+          <button id="pauseBtn" title="Pause">⏸</button>
+          <span id="timer">0:00 / 0:00</span>
+          <button id="fullscreenBtn" title="Fullscreen">⛶</button>
+        </div>
+      </div>
+
+      <button id="fullscreenExitBtn" style="
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 30;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: none;
+        font-size: 16px;
+      ">✕ Tam Ekrından Çık</button>
+    </div>
+
+    <div id="skipWarning" class="warning">
+      ⚠️ Lütfen buradan itibaren izleyin.
+    </div>
+    <div id="tabWarning" class="warning">
+      ⚠️ Bu sekmeyi terk ettiniz.
+    </div>
+
+    <div class="buttons">
+      <button id="backBtn" class="btn">← Geri</button>
+      <button id="continueBtn" class="btn" style="display: none;">Forma Devam Et →</button>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script>
+    window.LANG = 'tr';  // ← CHANGE per file: de, en, fr, es, ru, hu, tr
+  </script>
+  <script src="shared.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C.F. Maier – Safety Briefing</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    #title {
+      color: #333;
+    }
+
+    .instruction {
+      color: #666;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="title">Safety Briefing</h1>
+    <p class="instruction" id="instruction">Please watch the full safety video.</p>
+
+    <div id="videoContainer">
+      <video
+        id="video"
+        controlsList="nodownload noremoteplayback"
+        disablePictureInPicture
+        preload="metadata"
+      ></video>
+
+      <div id="clickShield"></div>
+
+      <div class="controls">
+        <!-- Progress Bar -->
+        <div id="progressBar"></div>
+
+        <!-- Controls Row -->
+        <div class="controls-row">
+          <button id="playBtn" title="Play">▶</button>
+          <button id="pauseBtn" title="Pause">⏸</button>
+          <span id="timer">0:00 / 0:00</span>
+          <button id="fullscreenBtn" title="Fullscreen">⛶</button>
+        </div>
+      </div>
+
+      <!-- Fullscreen Exit Button (only visible in fullscreen) -->
+      <button id="fullscreenExitBtn" style="
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 30;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: none;
+        font-size: 16px;
+      ">✕ Exit Fullscreen</button>
+    </div>
+
+    <!-- Warnings -->
+    <div id="skipWarning" class="warning">
+      ⚠️ Please watch from where you left off.
+    </div>
+    <div id="tabWarning" class="warning">
+      ⚠️ You left this tab.
+    </div>
+
+    <!-- Buttons -->
+    <div class="buttons">
+      <button id="backBtn" class="btn">← Back</button>
+      <button id="continueBtn" class="btn" style="display: none;">Continue to Form →</button>
+    </div>
+  </div>
+
+  <!-- === SCRIPTS === -->
+  <!-- 1. Configuration (Video-URLs, Forms-Links, Texts) -->
+  <script src="config.js"></script>
+
+  <!-- 2. Set language (IMPORTANT: only this line changes per file!) -->
+  <script>
+    window.LANG = 'en';  // ← CHANGE per file: de, en, fr, es, ru, hu, tr
+  </script>
+
+  <!-- 3. Player logic (Security, Controls, etc.) -->
+  <script src="shared.js"></script>
+</body>
+</html>

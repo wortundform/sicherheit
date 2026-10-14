@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C.F. Maier – Safety Briefing</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      padding: 50px 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .languages {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .lang-btn {
+      padding: 15px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      border: 2px solid #667eea;
+      background: white;
+      color: #667eea;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: block;
+    }
+
+    .lang-btn:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .lang-btn:active {
+      transform: translateY(0);
+    }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #999;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 30px 25px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .languages {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .lang-btn {
+        padding: 12px 15px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🛡️ Safety Briefing</h1>
+    <p class="subtitle">Select your language to begin the safety briefing.</p>
+
+    <div class="languages">
+      <a href="index-de.html" class="lang-btn">🇩🇪 Deutsch</a>
+      <a href="index-en.html" class="lang-btn">🇬🇧 English</a>
+      <a href="index-fr.html" class="lang-btn">🇫🇷 Français</a>
+      <a href="index-es.html" class="lang-btn">🇪🇸 Español</a>
+      <a href="index-ru.html" class="lang-btn">🇷🇺 Русский</a>
+      <a href="index-hu.html" class="lang-btn">🇭🇺 Magyar</a>
+      <a href="index-tr.html" class="lang-btn">🇹🇷 Türkçe</a>
+    </div>
+
+    <div class="footer">
+      <p>C.F. Maier – Werksicherheit</p>
+    </div>
+  </div>
+</body>
+</html>
