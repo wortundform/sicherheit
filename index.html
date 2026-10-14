@@ -331,7 +331,9 @@ document.addEventListener("DOMContentLoaded", () => {
   video.src = data.video;
 
   // ── Back button ──────────────────────────────────────────────────────────
-  backBtn.onclick = () => history.back();
+  backBtn.onclick = () => {
+  window.location.href = "https://sites.google.com/view/cfm-sicherheit/language";
+};
 
   // ── Continue button (locked until video truly ends) ──────────────────────
   // The onclick is set ONLY here, inside the closure — it cannot be
