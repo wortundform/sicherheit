@@ -8,10 +8,10 @@ const VIDEOS = {
   de: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250995/cfm_sicherheitunterweisung_de_gqtjuy.mp4",
   en: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778251014/cfm_sicherheitunterweisung_en_prlc6d.mp4",
   fr: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778251032/cfm_sicherheitunterweisung_fr_llw8bp.mp4",
-  es: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778251053/cfm_sicherheitunterweisung_es_ul0bqo.mp4",
+  es: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250992/cfm_sicherheitunterweisung_esp_ul0bqo.mp4",
   ru: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778251071/cfm_sicherheitunterweisung_ru_jnuuc5.mp4",
   hu: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778251089/cfm_sicherheitunterweisung_hu_xpldff.mp4",
-  tr: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778251107/cfm_sicherheitunterweisung_tr_hhpghe.mp4"
+  tr: "https://res.cloudinary.com/dt0u20yez/video/upload/v1778250987/cfm_sicherheitunterweisung_tu_hhpghe.mp4"
 };
 
 // Forms-Links (neue URL-Struktur)
