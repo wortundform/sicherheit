@@ -172,24 +172,34 @@
 
   // === 9. FULLSCREEN ===
   fullscreenBtn.addEventListener("click", () => {
-    if (videoContainer.requestFullscreen) {
-      videoContainer.requestFullscreen();
-    } else if (videoContainer.webkitRequestFullscreen) {
-      videoContainer.webkitRequestFullscreen();
-    }
-  });
-
-  fullscreenExitBtn.addEventListener("click", () => {
+  if (document.fullscreenElement) {
+    // Bereits im Fullscreen → Beenden
     if (document.exitFullscreen) {
       document.exitFullscreen();
     } else if (document.webkitExitFullscreen) {
       document.webkitExitFullscreen();
     }
-  });
+  } else {
+    // Nicht im Fullscreen → Eintreten
+    if (videoContainer.requestFullscreen) {
+      videoContainer.requestFullscreen();
+    } else if (videoContainer.webkitRequestFullscreen) {
+      videoContainer.webkitRequestFullscreen();
+    }
+  }
+});
 
-  document.addEventListener("fullscreenchange", () => {
-    fullscreenExitBtn.style.display = document.fullscreenElement ? "block" : "none";
-  });
+fullscreenExitBtn.addEventListener("click", () => {
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  }
+});
+
+document.addEventListener("fullscreenchange", () => {
+  fullscreenExitBtn.style.display = document.fullscreenElement ? "block" : "none";
+});
 
   // === 10. BACK-BUTTON ===
   backBtn.addEventListener("click", () => {
