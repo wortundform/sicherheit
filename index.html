@@ -13,7 +13,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #f5f5f5;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -25,8 +25,8 @@
       background: white;
       padding: 50px 40px;
       border-radius: 12px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-      max-width: 600px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      max-width: 1000px;
       width: 100%;
       text-align: center;
     }
@@ -44,36 +44,40 @@
       line-height: 1.6;
     }
 
-    .languages {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 15px;
+    .language-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      justify-content: center;
       margin-bottom: 30px;
     }
 
-    .lang-btn {
-      padding: 15px 20px;
-      font-size: 16px;
-      font-weight: 600;
-      border: 2px solid #667eea;
-      background: white;
-      color: #667eea;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
+    .language-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-decoration: none;
-      display: block;
+      cursor: pointer;
+      transition: transform 0.2s;
     }
 
-    .lang-btn:hover {
-      background: #667eea;
-      color: white;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    .language-btn:hover {
+      transform: scale(1.1);
     }
 
-    .lang-btn:active {
-      transform: translateY(0);
+    .flag-img {
+      width: 120px;
+      height: 80px;
+      object-fit: contain;
+      margin-bottom: 12px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .language-name {
+      font-size: 16px;
+      color: #333;
+      font-weight: 500;
     }
 
     .footer {
@@ -82,7 +86,7 @@
       color: #999;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
       .container {
         padding: 30px 25px;
       }
@@ -91,13 +95,16 @@
         font-size: 24px;
       }
 
-      .languages {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+      .language-grid {
+        gap: 25px;
       }
 
-      .lang-btn {
-        padding: 12px 15px;
+      .flag-img {
+        width: 100px;
+        height: 67px;
+      }
+
+      .language-name {
         font-size: 14px;
       }
     }
@@ -108,14 +115,35 @@
     <h1>🛡️ Safety Briefing</h1>
     <p class="subtitle">Select your language to begin the safety briefing.</p>
 
-    <div class="languages">
-      <a href="index-de.html" class="lang-btn">🇩🇪 Deutsch</a>
-      <a href="index-en.html" class="lang-btn">🇬🇧 English</a>
-      <a href="index-fr.html" class="lang-btn">🇫🇷 Français</a>
-      <a href="index-es.html" class="lang-btn">🇪🇸 Español</a>
-      <a href="index-ru.html" class="lang-btn">🇷🇺 Русский</a>
-      <a href="index-hu.html" class="lang-btn">🇭🇺 Magyar</a>
-      <a href="index-tr.html" class="lang-btn">🇹🇷 Türkçe</a>
+    <div class="language-grid">
+      <a href="index-de.html" class="language-btn">
+        <img src="flags/de.png" alt="Deutsch" class="flag-img">
+        <div class="language-name">Deutsch</div>
+      </a>
+      <a href="index-en.html" class="language-btn">
+        <img src="flags/en.png" alt="English" class="flag-img">
+        <div class="language-name">English</div>
+      </a>
+      <a href="index-fr.html" class="language-btn">
+        <img src="flags/fr.png" alt="Français" class="flag-img">
+        <div class="language-name">Français</div>
+      </a>
+      <a href="index-es.html" class="language-btn">
+        <img src="flags/es.png" alt="Español" class="flag-img">
+        <div class="language-name">Español</div>
+      </a>
+      <a href="index-ru.html" class="language-btn">
+        <img src="flags/ru.png" alt="Русский" class="flag-img">
+        <div class="language-name">Русский</div>
+      </a>
+      <a href="index-hu.html" class="language-btn">
+        <img src="flags/hu.png" alt="Magyar" class="flag-img">
+        <div class="language-name">Magyar</div>
+      </a>
+      <a href="index-tr.html" class="language-btn">
+        <img src="flags/tr.png" alt="Türkçe" class="flag-img">
+        <div class="language-name">Türkçe</div>
+      </a>
     </div>
 
     <div class="footer">
