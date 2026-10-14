@@ -22,33 +22,24 @@
     }
 
     .container {
-      background: white;
+      background: #f5f5f5;
       padding: 50px 40px;
       border-radius: 12px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-      max-width: 1000px;
+      max-width: 1200px;
       width: 100%;
       text-align: center;
     }
 
     h1 {
       font-size: 32px;
-      margin-bottom: 15px;
+      margin-bottom: 40px;
       color: #333;
     }
 
-    .subtitle {
-      font-size: 16px;
-      color: #666;
-      margin-bottom: 40px;
-      line-height: 1.6;
-    }
-
     .language-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 40px;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30px;
       margin-bottom: 30px;
     }
 
@@ -62,7 +53,7 @@
     }
 
     .language-btn:hover {
-      transform: scale(1.1);
+      transform: scale(1.05);
     }
 
     .flag-img {
@@ -70,8 +61,6 @@
       height: 80px;
       object-fit: contain;
       margin-bottom: 12px;
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .language-name {
@@ -81,9 +70,16 @@
     }
 
     .footer {
-      margin-top: 30px;
+      margin-top: 40px;
       font-size: 12px;
       color: #999;
+    }
+
+    @media (max-width: 1024px) {
+      .language-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+      }
     }
 
     @media (max-width: 768px) {
@@ -93,10 +89,12 @@
 
       h1 {
         font-size: 24px;
+        margin-bottom: 30px;
       }
 
       .language-grid {
-        gap: 25px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
       }
 
       .flag-img {
@@ -112,8 +110,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>🛡️ Safety Briefing</h1>
-    <p class="subtitle">Select your language to begin the safety briefing.</p>
+    <h1>Willkommen!</h1>
 
     <div class="language-grid">
       <a href="index-de.html" class="language-btn">
