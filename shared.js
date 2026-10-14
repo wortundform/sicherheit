@@ -13,19 +13,9 @@ function initializePlayer() {
   const tabWarning = document.getElementById("tabWarning");
   const progressBar = document.getElementById("progressBar");
   const timer = document.getElementById("timer");
-
-  if (!video || !VIDEOS[window.LANG]) {
-    console.error("Video oder LANG nicht definiert");
-    return;
-  }
+  const controls = document.querySelector('.controls');
 
   video.src = VIDEOS[window.LANG];
-
-  let maxReached = 0;
-  let skipWarningTimeout;
-  let tabWarningTimeout;
-  let controlsTimeout;
-  const controls = document.querySelector('.controls');
 
   video.addEventListener("seeking", () => {
     if (video.currentTime > maxReached + 0.3) {
@@ -187,4 +177,4 @@ function initializePlayer() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", initializePlayer);
+initializePlayer();
