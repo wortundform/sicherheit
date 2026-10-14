@@ -19,6 +19,8 @@
   const backBtn = document.getElementById("backBtn");
   const continueBtn = document.getElementById("continueBtn");
   const skipWarning = document.getElementById("skipWarning");
+  const clickShield = document.getElementById("clickShield");
+    clickShield.style.display = "none";
   const tabWarning = document.getElementById("tabWarning");
 
   // === Validierung ===
