@@ -27,6 +27,38 @@
   if (!video || !VIDEOS[window.LANG]) {
     console.error("Video-Element oder Sprache nicht gefunden.");
     return;
+
+    let controlsTimeout;
+const controls = document.querySelector('.controls');
+
+function showControls() {
+  controls.style.display = "block";
+  clearTimeout(controlsTimeout);
+  
+  if (!video.paused) {
+    controlsTimeout = setTimeout(() => {
+      controls.style.display = "none";
+    }, 3000);
+  }
+}
+
+function hideControls() {
+  if (!video.paused) {
+    controls.style.display = "none";
+  }
+}
+
+video.addEventListener("play", hideControls);
+video.addEventListener("pause", showControls);
+
+videoContainer.addEventListener("mousemove", showControls);
+videoContainer.addEventListener("mouseleave", () => {
+  if (!video.paused) {
+    hideControls();
+  }
+});
+
+videoContainer.addEventListener("touchstart", showControls);
   }
 
   // === Video-Quelle setzen ===
