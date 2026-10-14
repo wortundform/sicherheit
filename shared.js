@@ -14,6 +14,7 @@ function initializePlayer() {
   const progressBar = document.getElementById("progressBar");
   const timer = document.getElementById("timer");
   const controls = document.querySelector('.controls');
+  let controlsTimeout;
 
   video.src = VIDEOS[window.LANG];
 
